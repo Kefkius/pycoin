@@ -1,5 +1,5 @@
 from pycoin import ecdsa
-from pycoin.encoding import EncodingError, a2b_hashed_base58, \
+from pycoin.encoding import EncodingError, a2b_hashed_base58, a2b_hashed_base58_grs, \
     from_bytes_32, hash160, hash160_sec_to_bitcoin_address, \
     is_sec_compressed, public_pair_to_sec, public_pair_to_hash160_sec, \
     sec_to_public_pair, secret_exponent_to_wif
@@ -85,8 +85,15 @@ class Key(object):
         The "is_compressed" parameter is ignored unless a public address is passed in.
         """
 
-        data = a2b_hashed_base58(text)
+        grs_encoded = False
+        try:
+            data = a2b_hashed_base58(text)
+        except EncodingError:
+            data = a2b_hashed_base58_grs(text)
+            grs_encoded = True
         netcode, key_type, length = netcode_and_type_for_data(data)
+        if grs_encoded:
+            netcode = 'GRS'
         data = data[1:]
 
         if key_type in ("pub32", "prv32"):
@@ -133,7 +140,8 @@ class Key(object):
             return None
         return secret_exponent_to_wif(secret_exponent,
                                       compressed=not self._use_uncompressed(use_uncompressed),
-                                      wif_prefix=wif_prefix)
+                                      wif_prefix=wif_prefix,
+                                      grs=self.is_grs())
 
     def public_pair(self):
         """
@@ -146,6 +154,9 @@ class Key(object):
         Return the netcode
         """
         return self._netcode
+
+    def is_grs(self):
+        return self._netcode == 'GRS'
 
     def sec(self, use_uncompressed=None):
         """
@@ -195,7 +206,7 @@ class Key(object):
         address_prefix = address_prefix_for_netcode(self._netcode)
         hash160 = self.hash160(use_uncompressed=use_uncompressed)
         if hash160:
-            return hash160_sec_to_bitcoin_address(hash160, address_prefix=address_prefix)
+            return hash160_sec_to_bitcoin_address(hash160, address_prefix=address_prefix, grs=self.is_grs())
         return None
 
     bitcoin_address = address

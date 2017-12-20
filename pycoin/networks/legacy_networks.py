@@ -84,4 +84,5 @@ NETWORKS = (
 
     NetworkValues("Clams", "mainnet", "CLAM",  b'\x85', b'\x89', b'\x0d', h2b("0488ADE4"), h2b("0488B21E")),
 
+    NetworkValues("Groestlcoin", "mainnet", "GRS",  b'\x80', b'\x24', b'\x05', h2b("0488ADE4"), h2b("0488B21E")),
 )
