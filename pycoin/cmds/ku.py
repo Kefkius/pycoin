@@ -200,8 +200,8 @@ def dump_output(output_dict, output_order):
         if val is None:
             print(hr_key)
         else:
-            if len(val) > 80:
-                val = "%s\\\n%s%s" % (val[:66], ' ' * (5 + max_length), val[66:])
+#            if len(val) > 80:
+#                val = "%s\\\n%s%s" % (val[:66], ' ' * (5 + max_length), val[66:])
             print("%s%s: %s" % (hr_key, space_padding, val))
 
 
